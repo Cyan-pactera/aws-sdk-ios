@@ -63,7 +63,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     [publicKeyAttr setObject:[NSNumber numberWithBool:YES] forKey:(id)kSecAttrIsPermanent];
     [publicKeyAttr setObject:publicTag forKey:(id)kSecAttrApplicationTag];
     
-    [keyPairAttr setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [keyPairAttr setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     [keyPairAttr setObject:[NSNumber numberWithUnsignedInteger:2048] forKey:(id)kSecAttrKeySizeInBits];
     
     [keyPairAttr setObject:privateKeyAttr forKey:(id)kSecPrivateKeyAttrs];
@@ -100,11 +100,11 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     
     [queryPublicKey setObject:(id)kSecClassKey forKey:(id)kSecClass];
     [queryPublicKey setObject:publicTag forKey:(id)kSecAttrApplicationTag];
-    [queryPublicKey setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [queryPublicKey setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     
     [queryPrivateKey setObject:(id)kSecClassKey forKey:(id)kSecClass];
     [queryPrivateKey setObject:privateTag forKey:(id)kSecAttrApplicationTag];
-    [queryPrivateKey setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [queryPrivateKey setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     
     sanityCheck = SecItemDelete((CFDictionaryRef)queryPrivateKey);
     if (sanityCheck != noErr) {
@@ -125,7 +125,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
             status = NO;
         }
     }
-
+    
     return status;
 }
 
@@ -146,7 +146,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
 }
 
 + (NSData *)certToDer:(NSString *)cert {
- 
+    
     if ([cert rangeOfString:AWSIoTKeychainStartCertKeyTag].location != NSNotFound) {
         cert = [cert substringFromIndex:AWSIoTKeychainStartCertKeyTag.length];
     }
@@ -158,7 +158,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
 }
 
 + (BOOL)addCertificateToKeychain:(NSString*)cert {
-        return [AWSIoTKeychain addCertificate:[AWSIoTKeychain certToDer:cert]];
+    return [AWSIoTKeychain addCertificate:[AWSIoTKeychain certToDer:cert]];
 }
 
 + (BOOL)addCertificateFromPemFile:(NSString*)fileName withTag:(NSString*)tag {
@@ -205,7 +205,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     [queryCertificate setObject:(id)kSecClassCertificate forKey:(id)kSecClass];
     [queryCertificate setObject:[AWSIoTKeychain certTag] forKey:(id)kSecAttrLabel];
     [queryCertificate setObject:(__bridge id)certRef forKey:(id)kSecValueRef];
-
+    
     OSStatus sanityCheck = SecItemAdd((CFDictionaryRef)queryCertificate, nil);
     if ((sanityCheck != noErr) && (sanityCheck != errSecDuplicateItem)) {
         AWSDDLogError(@"add certificate to keychain with error: %d", (int)sanityCheck);
@@ -285,7 +285,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     
     [queryPublicKey setObject:(id)kSecClassKey forKey:(id)kSecClass];
     [queryPublicKey setObject:tag forKey:(id)kSecAttrApplicationTag];
-    [queryPublicKey setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [queryPublicKey setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     [queryPublicKey setObject:[NSNumber numberWithBool:YES] forKey:(id)kSecReturnRef];
     
     sanityCheck = SecItemCopyMatching((CFDictionaryRef)queryPublicKey, (CFTypeRef *)&publicKeyReference);
@@ -305,7 +305,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     
     [queryPublicKey setObject:(id)kSecClassKey forKey:(id)kSecClass];
     [queryPublicKey setObject:tag forKey:(id)kSecAttrApplicationTag];
-    [queryPublicKey setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [queryPublicKey setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     [queryPublicKey setObject:[NSNumber numberWithBool:YES] forKey:(id)kSecReturnData];
     
     sanityCheck = SecItemCopyMatching((CFDictionaryRef)queryPublicKey, &publicKeyRef);
@@ -326,7 +326,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     
     [queryPrivateKey setObject:(id)kSecClassKey forKey:(id)kSecClass];
     [queryPrivateKey setObject:tag forKey:(id)kSecAttrApplicationTag];
-    [queryPrivateKey setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [queryPrivateKey setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     [queryPrivateKey setObject:[NSNumber numberWithBool:YES] forKey:(id)kSecReturnRef];
     
     sanityCheck = SecItemCopyMatching((CFDictionaryRef)queryPrivateKey, (CFTypeRef *)&privateKeyReference);
@@ -347,7 +347,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     
     [queryPrivateKey setObject:(id)kSecClassKey forKey:(id)kSecClass];
     [queryPrivateKey setObject:tag forKey:(id)kSecAttrApplicationTag];
-    [queryPrivateKey setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [queryPrivateKey setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     [queryPrivateKey setObject:[NSNumber numberWithBool:YES] forKey:(id)kSecReturnData];
     
     sanityCheck = SecItemCopyMatching((CFDictionaryRef)queryPrivateKey, &privateKeyBits);
@@ -367,8 +367,8 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     NSMutableDictionary * queryIdentityRef = [[NSMutableDictionary alloc] init];
     
     [queryIdentityRef setObject:(id)kSecClassIdentity forKey:(id)kSecClass];
-    [queryIdentityRef setObject:tag forKey:(id)kSecAttrApplicationTag]; 
-    [queryIdentityRef setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [queryIdentityRef setObject:tag forKey:(id)kSecAttrApplicationTag];
+    [queryIdentityRef setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     [queryIdentityRef setObject:[NSNumber numberWithBool:YES] forKey:(id)kSecReturnRef];
     
     sanityCheck = SecItemCopyMatching((CFDictionaryRef)queryIdentityRef, (CFTypeRef *)&identityRef);
@@ -389,7 +389,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     NSMutableDictionary * publicKeyAttr = [[NSMutableDictionary alloc] init];
     
     [publicKeyAttr setObject:(id)kSecClassKey forKey:(id)kSecClass];
-    [publicKeyAttr setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [publicKeyAttr setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     [publicKeyAttr setObject:tag forKey:(id)kSecAttrApplicationTag];
     [publicKeyAttr setObject:(__bridge id _Nonnull)(pubkeyRef) forKey:(id)kSecValueRef];
     [publicKeyAttr setObject:(id)kSecAttrKeyClassPublic forKey:(id)kSecAttrKeyClass];
@@ -412,7 +412,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     NSMutableDictionary * publicKeyAttr = [[NSMutableDictionary alloc] init];
     
     [publicKeyAttr setObject:(id)kSecClassKey forKey:(id)kSecClass];
-    [publicKeyAttr setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [publicKeyAttr setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     [publicKeyAttr setObject:tag forKey:(id)kSecAttrApplicationTag];
     [publicKeyAttr setObject:pubkey forKey:(id)kSecValueData];
     [publicKeyAttr setObject:(id)kSecAttrKeyClassPublic forKey:(id)kSecAttrKeyClass];
@@ -435,7 +435,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     NSMutableDictionary * privateKeyAttr = [[NSMutableDictionary alloc] init];
     
     [privateKeyAttr setObject:(id)kSecClassKey forKey:(id)kSecClass];
-    [privateKeyAttr setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [privateKeyAttr setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     [privateKeyAttr setObject:tag forKey:(id)kSecAttrApplicationTag];
     [privateKeyAttr setObject:(__bridge id _Nonnull)(privkeyRef) forKey:(id)kSecValueRef];
     [privateKeyAttr setObject:(id)kSecAttrKeyClassPrivate forKey:(id)kSecAttrKeyClass];
@@ -458,7 +458,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     NSMutableDictionary * privateKeyAttr = [[NSMutableDictionary alloc] init];
     
     [privateKeyAttr setObject:(id)kSecClassKey forKey:(id)kSecClass];
-    [privateKeyAttr setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [privateKeyAttr setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     [privateKeyAttr setObject:tag forKey:(id)kSecAttrApplicationTag];
     [privateKeyAttr setObject:privkey forKey:(id)kSecValueData];
     [privateKeyAttr setObject:(id)kSecAttrKeyClassPrivate forKey:(id)kSecAttrKeyClass];
@@ -509,7 +509,7 @@ NSString *const AWSIoTKeychainEndCertKeyTag = @"\n-----END CERTIFICATE-----";
     
     [queryPrivateKey setObject:(id)kSecClassKey forKey:(id)kSecClass];
     [queryPrivateKey setObject:tag forKey:(id)kSecAttrApplicationTag];
-    [queryPrivateKey setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
+    [queryPrivateKey setObject:(id)kSecAttrKeyTypeEC forKey:(id)kSecAttrKeyType];
     
     OSStatus sanityCheck = SecItemDelete((CFDictionaryRef)queryPrivateKey);
     if (sanityCheck != noErr) {
